@@ -26,7 +26,18 @@ A Python project for learning LangChain fundamentals.
    cd my-first-langchain
    ```
 
-3. **Run the project**:
+3. **Set up OpenAI API key**:
+   Create a `.env` file in the project root:
+   ```bash
+   OPENAI_API_KEY=your-api-key-here
+   ```
+   Or set as environment variable:
+   ```bash
+   export OPENAI_API_KEY='your-api-key-here'
+   ```
+   Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+
+4. **Run the project**:
    ```bash
    uv run main.py
    ```
