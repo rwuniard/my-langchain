@@ -17,7 +17,7 @@ def main():
         return
     
     try:
-        llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.9)
+        llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.2)
         response = llm.invoke("What is the capital of France?")
         print(f"🤖 AI Response: {response}")
     except Exception as e:
