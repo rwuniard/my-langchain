@@ -22,19 +22,33 @@ LangChain project focused on exploring and implementing chains.
    ```
 
 4. **Run the project**:
+   
+   **Legacy approach** (using deprecated LLMChain):
    ```bash
    uv run main.py
+   ```
+   
+   **Modern approach** (using LCEL):
+   ```bash
+   uv run main_lcel.py
    ```
 
 ## Features
 
 This project demonstrates:
-- Basic LangChain chain implementation
+- Basic LangChain chain implementation (legacy and modern approaches)
 - Prompt templates with variables
 - Integration with OpenAI models
 - Environment variable management
+- LCEL (LangChain Expression Language) syntax
+
+## Files
+
+- `main.py` - Legacy implementation using `LLMChain` (deprecated)
+- `main_lcel.py` - Modern implementation using LCEL syntax (`prompt | llm`)
 
 ## Notes
 
-- The current implementation uses `LLMChain` which is deprecated in LangChain 0.3+
-- For modern LangChain, consider using the LCEL (LangChain Expression Language) syntax: `prompt | llm` 
+- `LLMChain` is deprecated in LangChain 0.3+ and will be removed in 1.0
+- The modern approach uses LCEL syntax: `prompt | llm`
+- LCEL provides better performance and composability 
