@@ -30,7 +30,11 @@ LangChain project focused on exploring and implementing chains.
    
    **Modern approach** (using LCEL):
    ```bash
+   # Basic usage
    uv run main_lcel.py
+   
+   # With custom parameters
+   uv run main_lcel.py --language JavaScript --task "create a todo list"
    ```
 
 ## Features
@@ -41,11 +45,12 @@ This project demonstrates:
 - Integration with OpenAI models
 - Environment variable management
 - LCEL (LangChain Expression Language) syntax
+- Command line argument parsing for dynamic inputs
 
 ## Files
 
 - `main.py` - Legacy implementation using `LLMChain` (deprecated)
-- `main_lcel.py` - Modern implementation using LCEL syntax (`prompt | llm`)
+- `main_lcel.py` - Modern implementation using LCEL syntax (`prompt | llm`) with command line arguments
 
 ## Notes
 

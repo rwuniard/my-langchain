@@ -3,9 +3,16 @@ from dotenv import load_dotenv
 from langchain_openai import OpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain.chains import LLMChain
+import argparse
 
 load_dotenv()
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--language", type=str, default="Python")
+parser.add_argument("--task", type=str, default="print 10 numbers")
+args = parser.parse_args()
+args.language = args.language.lower()
+args.task = args.task.lower()
 
 code_prompt = PromptTemplate(
     input_variables=["language", "task"],
@@ -29,7 +36,7 @@ def main():
         # code_chain = LLMChain(llm=llm, prompt=code_prompt)
         # The more modern way is to use LCEL
         code_chain = code_prompt | llm
-        response = code_chain.invoke({"language": "Python", "task":"print 10 numbers"})
+        response = code_chain.invoke({"language": args.language, "task": args.task})
         print(f"🤖 AI Response: {response}")
     except Exception as e:
         print(f"❌ Error: {e}")
