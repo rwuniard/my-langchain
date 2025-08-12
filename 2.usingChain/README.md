@@ -54,6 +54,12 @@ LangChain project focused on exploring and implementing chains.
    # See specifically how "generated" key is created
    uv run demo_generated_key.py
    ```
+   
+   **Basic Runnable Examples**:
+   ```bash
+   # Simple demonstration of RunnableSequence and RunnableParallel
+   uv run simple_runnable.py
+   ```
 
 ## Features
 
@@ -69,14 +75,16 @@ This project demonstrates:
   - **Method 2**: Complex chaining with `RunnablePassthrough`
 - Structured output with Pydantic models vs. simple text output
 - Sequential chains for multi-step workflows
+- Basic runnable patterns: RunnableSequence (|) and RunnableParallel (dict)
 
 ## Files
 
 - `main.py` - Legacy implementation using `LLMChain` and `SequentialChain` (deprecated)
-- `main_lcel.py` - Modern implementation using LCEL syntax with Pydantic structured output
+- `main_lcel.py` - Modern implementation using LCEL syntax with Pydantic structured output (uses `llm.with_structured_output()`)
 - `main_simple.py` - Simple LCEL implementation without Pydantic (cleaner setup, verbose output)
 - `demo_passthrough.py` - Demonstration of how `RunnablePassthrough.assign()` works
 - `demo_generated_key.py` - Specific example showing how the "generated" key is created
+- `simple_runnable.py` - Basic examples of RunnableSequence and RunnableParallel using simple lambda functions
 
 ## Chaining Approaches
 
@@ -118,7 +126,7 @@ def extract_code_and_add_language(data):
 - ✅ Clean, consistent output
 - ✅ Type safety and validation
 - ✅ Easy programmatic access
-- ❌ More complex setup
+- ✅ Uses modern `llm.with_structured_output()` method (no manual parsing needed)
 
 ### Without Pydantic (Good for Learning/Prototyping)
 - ✅ Simpler setup

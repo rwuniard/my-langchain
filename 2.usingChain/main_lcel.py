@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel
 from langchain.chains import LLMChain
 import argparse
@@ -24,20 +23,14 @@ class Code(BaseModel):
 class CodeCheck(BaseModel):
     final_code: str
 
-# Create parser first
-code_parser = PydanticOutputParser(pydantic_object=Code)
-code_check_parser = PydanticOutputParser(pydantic_object=CodeCheck)
-
 code_prompt = PromptTemplate(
     input_variables=["language", "task"],
-    template="Write a very short {language} function that will {task}\n{format_instructions}\n\nIMPORTANT: Return ONLY valid JSON, no other text!",
-    partial_variables={"format_instructions": code_parser.get_format_instructions()}
+    template="Write a very short {language} function that will {task}"
 )
 
 code_check_prompt = PromptTemplate(
     input_variables=["language", "code"],
-    template="Write a test for the following {language} code:\n {code}\n{format_instructions}",
-    partial_variables={"format_instructions": code_check_parser.get_format_instructions()}
+    template="Write a test for the following {language} code:\n {code}"
 )
 
 
