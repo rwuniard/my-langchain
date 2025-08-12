@@ -45,6 +45,15 @@ LangChain project focused on exploring and implementing chains.
    # With custom parameters
    uv run main_simple.py --language Python --task "calculate factorial"
    ```
+   
+   **Understanding RunnablePassthrough** (educational demos):
+   ```bash
+   # See how RunnablePassthrough.assign() creates keys
+   uv run demo_passthrough.py
+   
+   # See specifically how "generated" key is created
+   uv run demo_generated_key.py
+   ```
 
 ## Features
 
@@ -66,6 +75,8 @@ This project demonstrates:
 - `main.py` - Legacy implementation using `LLMChain` and `SequentialChain` (deprecated)
 - `main_lcel.py` - Modern implementation using LCEL syntax with Pydantic structured output
 - `main_simple.py` - Simple LCEL implementation without Pydantic (cleaner setup, verbose output)
+- `demo_passthrough.py` - Demonstration of how `RunnablePassthrough.assign()` works
+- `demo_generated_key.py` - Specific example showing how the "generated" key is created
 
 ## Chaining Approaches
 
@@ -82,11 +93,24 @@ simple_chain = RunnableLambda(simple_chain_function)
 ### Method 2: Complex Chaining with RunnablePassthrough
 ```python
 complex_chain = (
-    RunnablePassthrough.assign(generated=generate_code_chain)
+    RunnablePassthrough.assign(generated=generate_code_chain)  # Creates "generated" key
     | RunnableLambda(extract_code_and_add_language)
     | code_check_chain
 )
+
+def extract_code_and_add_language(data):
+    """Data transformation function"""
+    return {
+        "code": data["generated"].code,  # Access the "generated" key created by assign()
+        "language": data["language"]     # Pass through original language
+    }
 ```
+
+**How `RunnablePassthrough.assign()` works:**
+- Takes original input: `{"language": "Python", "task": "add numbers"}`
+- Runs `generate_code_chain` on this input
+- Adds result to original data with the key name you specify: `generated`
+- Output: `{"language": "Python", "task": "add numbers", "generated": Code(...)}`
 
 ## Structured Output Comparison
 
