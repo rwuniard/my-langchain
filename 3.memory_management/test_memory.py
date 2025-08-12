@@ -17,10 +17,9 @@ def get_session_history(session_id: str) -> ChatMessageHistory:
         store[session_id] = ChatMessageHistory()
     return store[session_id]
 
-
-def main():
-    print("Hello from 3-memory-management!")
-
+def test_memory():
+    print("🧪 Testing memory management...")
+    
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
     # Create a prompt template that includes a placeholder for chat history
@@ -41,16 +40,25 @@ def main():
         history_messages_key="history"
     )
 
-    while True:
-        user_input = input(">> ")
-        if user_input == "exit":
-            break
-        result = chain_with_memory.invoke(
-            {"content": user_input},
-            config={"configurable": {"session_id": "1"}}
-        )
-        print(f"AI response: {result}")
-
+    # Test conversation with memory
+    session_config = {"configurable": {"session_id": "test_session"}}
+    
+    print("💬 First message:")
+    response1 = chain_with_memory.invoke(
+        {"content": "My name is Alice. Remember this!"},
+        config=session_config
+    )
+    print(f"AI: {response1}")
+    
+    print("\n💬 Second message (testing memory):")
+    response2 = chain_with_memory.invoke(
+        {"content": "What is my name?"},
+        config=session_config
+    )
+    print(f"AI: {response2}")
+    
+    print("\n✅ Memory test completed!")
+    print(f"📊 Messages in memory: {len(store['test_session'].messages)}")
 
 if __name__ == "__main__":
-    main()
+    test_memory()
