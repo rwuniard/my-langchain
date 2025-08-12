@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import OpenAI
 from langchain_core.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.chains import LLMChain, SequentialChain
 
 load_dotenv()
 
@@ -11,7 +11,10 @@ code_prompt = PromptTemplate(
     input_variables=["language", "task"],
     template="Write a very short {language} function that will {task}"
 )
-
+code_check_prompt = PromptTemplate(
+    input_variables=["language", "code"],
+    template="Write a test code for the following {language} code:\n {code}"
+)
 
 
 def main():
@@ -30,9 +33,27 @@ def main():
             prompt=code_prompt,
             output_key="code"
         )
-        response = code_chain.invoke({"language": "Python", "task": "print 10 numbers"})
-        print(response)
-        print(f"🤖 AI Response: {response['code']}")
+        # response = code_chain.invoke({"language": "Python", "task": "print 10 numbers"})
+        # print(response)
+        # print(f"🤖 AI Response: {response['code']}")
+
+        code_check_chain = LLMChain(
+            llm=llm,
+            prompt=code_check_prompt,
+            output_key="test_code"
+        )
+
+        # Create a sequential chain to check the code
+        chain = SequentialChain(
+            chains=[code_chain, code_check_chain],
+            input_variables=["language", "task"],
+            output_variables=["code", "test_code"]
+        )
+        response = chain.invoke({"language": "Python", "task": "print 10 numbers"})
+      
+        response_code_check = code_check_chain.invoke({"language": "Python", "code": response['code']})
+        print(response_code_check)
+        print(f"🤖 AI Response: {response_code_check['test_code']}")
     except Exception as e:
         print(f"❌ Error: {e}")
 
