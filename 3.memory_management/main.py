@@ -38,7 +38,7 @@ def main():
         chain,
         get_session_history,
         input_messages_key="content",
-        history_messages_key="history"
+        history_messages_key="history" # This must match the variable_name in the MessagesPlaceholder
     )
 
     while True:
@@ -47,7 +47,7 @@ def main():
             break
         result = chain_with_memory.invoke(
             {"content": user_input},
-            config={"configurable": {"session_id": "1"}}
+            config={"configurable": {"session_id": "1"}} #the session id in real world context would be a user id
         )
         print(f"AI response: {result}")
 
