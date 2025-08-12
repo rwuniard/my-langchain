@@ -12,7 +12,7 @@ LangChain project focused on exploring and implementing chains.
 2. **Add dependencies**:
    ```bash
    uv add python-dotenv
-   uv add langchain langchain-openai
+   uv add langchain langchain-openai langchain-core
    ```
 
 3. **Set up OpenAI API key**:
@@ -24,4 +24,17 @@ LangChain project focused on exploring and implementing chains.
 4. **Run the project**:
    ```bash
    uv run main.py
-   ``` 
+   ```
+
+## Features
+
+This project demonstrates:
+- Basic LangChain chain implementation
+- Prompt templates with variables
+- Integration with OpenAI models
+- Environment variable management
+
+## Notes
+
+- The current implementation uses `LLMChain` which is deprecated in LangChain 0.3+
+- For modern LangChain, consider using the LCEL (LangChain Expression Language) syntax: `prompt | llm` 
