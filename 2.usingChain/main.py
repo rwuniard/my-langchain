@@ -25,9 +25,14 @@ def main():
     
     try:
         llm = OpenAI(model="gpt-3.5-turbo-instruct", temperature=0.2)
-        code_chain = LLMChain(llm=llm, prompt=code_prompt)
-        response = code_chain.run(language="Python", task="pring 10 numbers'")
-        print(f"🤖 AI Response: {response}")
+        code_chain = LLMChain(
+            llm=llm, 
+            prompt=code_prompt,
+            output_key="code"
+        )
+        response = code_chain.invoke({"language": "Python", "task": "print 10 numbers"})
+        print(response)
+        print(f"🤖 AI Response: {response['code']}")
     except Exception as e:
         print(f"❌ Error: {e}")
 
