@@ -79,7 +79,10 @@ def main():
     print("Vectorstore: ", vectorstore)
 
     # Search the vectorstore
-    results = vectorstore.similarity_search_with_score("What is interesting fact about the English language?")
+    results = vectorstore.similarity_search_with_score(
+        "What is interesting fact about the English language?",
+        k=3 # Returning top 3 results with score in descending order, so we can later use the score to rank the results
+    )
     print("Results: ", results)
     for result in results:
         print("Result: ", result[1])
