@@ -3,3 +3,5 @@
 # Conversation history files (contains private chat data)
 conversations/
 **/conversations/
+
+.venv/
