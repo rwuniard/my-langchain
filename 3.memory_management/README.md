@@ -32,6 +32,11 @@ LangChain project focused on exploring and implementing memory management patter
    uv run main_with_file_persistence.py
    ```
    
+   **Interactive conversation** (with summary memory):
+   ```bash
+   uv run main_with_summary_lcel.py
+   ```
+   
    **Memory test** (automated demonstration):
    ```bash
    uv run test_memory.py
@@ -55,6 +60,12 @@ LangChain project focused on exploring and implementing memory management patter
    uv run demo_file_persistence_comparison.py
    uv run demo_file_autosave_internals.py
    uv run demo_when_saving_happens_in_chain.py
+   
+   # Summary memory demos
+   uv run main_with_summary_memory.py
+   uv run demo_summary_memory_comparison.py
+   uv run demo_correct_summary_timing.py
+   uv run demo_builtin_options.py
    ```
 
 ## Features
@@ -67,12 +78,15 @@ This project demonstrates:
 - **Memory Testing**: Automated verification of memory functionality
 - **File Persistence**: Automatic conversation saving with `FileChatMessageHistory`
 - **Auto-save Mechanism**: Understanding how conversations persist automatically
+- **Summary Memory**: Automatic conversation summarization for long chats
+- **Custom Memory Classes**: Building modern LCEL-compatible memory solutions
 
 ## Files
 
 ### Core Implementation
 - `main.py` - Interactive conversation application with in-memory storage
 - `main_with_file_persistence.py` - Interactive conversation with automatic file persistence
+- `main_with_summary_lcel.py` - Production-ready conversation with automatic summarization
 - `test_memory.py` - Automated test demonstrating memory functionality across messages
 
 ### Educational Demonstrations
@@ -87,6 +101,12 @@ This project demonstrates:
 - `demo_file_persistence_comparison.py` - Old vs new approach to file persistence
 - `demo_file_autosave_internals.py` - How `FileChatMessageHistory` auto-saves
 - `demo_when_saving_happens_in_chain.py` - When saves occur during chain execution
+
+**Summary Memory Implementation**:
+- `main_with_summary_memory.py` - Educational demos of summary memory approaches
+- `demo_summary_memory_comparison.py` - Legacy vs modern summary memory comparison
+- `demo_correct_summary_timing.py` - Correct timing of when summarization happens
+- `demo_builtin_options.py` - Exploration of available LangChain memory options
 
 ## Memory Implementation
 
@@ -233,6 +253,62 @@ conversations/
 └── conversation_default.json   # Default session
 ```
 
+## Summary Memory (ConversationSummaryMemory in LCEL)
+
+### The Problem with Legacy Approach
+
+```python
+# ❌ Legacy (Deprecated)
+from langchain.memory import ConversationSummaryMemory
+memory = ConversationSummaryMemory(llm=llm)
+```
+
+- ❌ Only works with deprecated `ConversationChain`
+- ❌ Not compatible with `RunnableWithMessageHistory`
+- ❌ Shows deprecation warnings
+
+### Modern LCEL Solution
+
+Create a custom `SummarizingChatMessageHistory` that automatically summarizes long conversations:
+
+```python
+class SummarizingChatMessageHistory(ChatMessageHistory):
+    def __init__(self, llm, max_messages=10, summary_message_count=4):
+        super().__init__()
+        self.llm = llm
+        self.max_messages = max_messages
+        # Create summarization chain
+        
+    def add_message(self, message):
+        super().add_message(message)
+        # Auto-summarize when conversation gets too long
+        if len(self.messages) > self.max_messages:
+            self._summarize_conversation()
+
+def get_session_history(session_id: str):
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    return SummarizingChatMessageHistory(llm)
+```
+
+### How Summary Memory Works
+
+1. **Monitor Conversation Length**: Checks message count on every addition
+2. **Automatic Summarization**: When limit exceeded, summarizes older messages
+3. **Keep Recent Context**: Preserves recent messages for immediate context
+4. **Seamless Integration**: Works transparently with `RunnableWithMessageHistory`
+
+### Why Custom Implementation?
+
+**LangChain provides 14+ storage backends but NO summarizing ChatMessageHistory**:
+- ✅ `FileChatMessageHistory`, `RedisChatMessageHistory`, etc.
+- ❌ No built-in `SummarizingChatMessageHistory`
+
+**Benefits of custom approach**:
+- **Modularity**: Can combine with any storage backend
+- **LCEL Native**: Built for modern LangChain patterns
+- **Full Control**: Custom summarization strategies
+- **Future-Proof**: Won't be deprecated like legacy components
+
 ## Notes
 
 - Environment variables are loaded from `.env` file
@@ -242,3 +318,5 @@ conversations/
 - `conversations/` folder excluded from git (contains private data)
 - Demo files provide deep understanding of memory system internals
 - File persistence works automatically - no manual save/load needed
+- Summary memory automatically manages long conversations
+- Custom memory classes provide modern LCEL-compatible solutions
