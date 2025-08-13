@@ -2,7 +2,7 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_openai import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.documents import Document
-from langchain.vectorstores.chroma import Chroma
+from langchain_chroma import Chroma
 from enum import Enum
 from dotenv import load_dotenv
 
