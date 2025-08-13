@@ -5,6 +5,9 @@ from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain.vectorstores.chroma import Chroma
+from langchain.schema import Document
+from langchain_core.embeddings import Embeddings
 from enum import Enum
 import os
 
@@ -45,6 +48,14 @@ def get_text_splitter():
         chunk_overlap=0
     )
 
+def store_to_chroma(documents: list[Document], embedding_model: Embeddings, persist_directory: str) -> Chroma:
+    vectorstore = Chroma.from_documents(
+        documents=documents,
+        embedding=embedding_model,
+        persist_directory=persist_directory
+    )
+    return vectorstore
+
 def main():
     print("Hello from 4-context-with-embedding!")
     llm = load_generative_ai_model(ModelVendor.GOOGLE)
@@ -53,13 +64,27 @@ def main():
     # print("Result: ", result.content)
 
     fact_doc = load_documents("facts.txt")
-    for doc in fact_doc:
-        print("Doc: ", doc.page_content)
-        print("--------------------------------")
+    # for doc in fact_doc:
+    #     print("Doc: ", doc.page_content)
+    #     print("--------------------------------")
 
+    # Initialize the embedding model
     embedding_model = load_embedding_model(ModelVendor.GOOGLE)
     emb = embedding_model.embed_query("What is the capital of France?")
-    print("Embedding: ", emb)
+    print("Embedding length: ", len(emb))
+    # print("Embedding: ", emb)
+
+    # Store the documents to Chroma
+    vectorstore = store_to_chroma(fact_doc, embedding_model, "chroma_db")
+    print("Vectorstore: ", vectorstore)
+
+    # Search the vectorstore
+    results = vectorstore.similarity_search_with_score("What is interesting fact about the English language?")
+    print("Results: ", results)
+    for result in results:
+        print("Result: ", result[1])
+        print("Result: ", result[0].page_content)
+        print("--------------------------------")
 
 
 if __name__ == "__main__":
