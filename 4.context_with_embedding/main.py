@@ -15,6 +15,7 @@ import os
 # and search the vectorstore for the most similar documents to the query
 # See the search_similarity.py and store_embeddings.py for a more modular approach between storing 
 # and searching
+# The prompt.py is an example on how to use the RetrievalQA chain to answer questions based on the context
 
 load_dotenv()
 
