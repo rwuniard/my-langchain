@@ -60,8 +60,20 @@ def load_llm(model_vendor: ModelVendor):
 # and pass them on to the LLM
 # The LLM will then use the documents to answer the question
 # The RetrievalQA chain will return the answer
+# The RetrievalQA is created as a facade to the vectorstore and the LLM
+# Each vectorstore can have different functions to search the vectorstore
+# So, the retriever will take an object that has get_relevant_documents function
+# In our case, Chroma returns a ChromaRetriever object that has get_relevant_documents function.
+# 
+# The chain type can be "stuff", "map_reduce", "map_rerank", "map_rerank_then_stuff"
+# The chain stuff is putting the document into the prompt template and passing it on to the LLM
+# The chain map_reduce is using the map_prompt and reduce_prompt to process the documents
+# The chain map_rerank is using the rerank_prompt to rerank the documents
+# The chain map_rerank_then_stuff is using the rerank_prompt to rerank the documents and then put the documents into the prompt template
+# and passing it on to the LLM
+# The chain map_rerank_then_stuff is the most powerful chain and is the default chain
 
-def load_retrieval_qa(model_vendor: ModelVendor):
+def load_retrieval_qa_chain(model_vendor: ModelVendor):
     llm = load_llm(model_vendor)
     vectorstore = load_vectorstore(model_vendor)
     return RetrievalQA.from_chain_type(
@@ -71,9 +83,27 @@ def load_retrieval_qa(model_vendor: ModelVendor):
     )
 
 def main():
-    retrieval_qa = load_retrieval_qa(ModelVendor.GOOGLE)
-    result = retrieval_qa.invoke("how many steps are there in Eiffel Tower?")
-    print("AI answer: ", result["result"])
+    retrieval_qa_chain = load_retrieval_qa_chain(ModelVendor.GOOGLE)
+    
+    print("RAG Question-Answering System")
+    print("-" * 30)
+    
+    while True:
+        user_question = input("\nEnter your question (or 'quit' to exit): ").strip()
+        
+        if user_question.lower() in ['quit', 'exit', 'q']:
+            print("Goodbye!")
+            break
+            
+        if not user_question:
+            print("Please enter a valid question.")
+            continue
+            
+        try:
+            result = retrieval_qa_chain.invoke(user_question)
+            print(f"\nAI answer: {result['result']}")
+        except Exception as e:
+            print(f"Error processing question: {e}")
 
 if __name__ == "__main__":
     main()
