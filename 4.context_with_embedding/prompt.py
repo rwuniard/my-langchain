@@ -6,6 +6,8 @@ from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
 from langchain.globals import set_debug
 
+from redundant_filter_retriever import RedundantFilterRetriever
+
 set_debug(True)
 
 from dotenv import load_dotenv
@@ -92,12 +94,21 @@ def load_llm(model_vendor: ModelVendor):
 def load_retrieval_qa_chain(model_vendor: ModelVendor):
     llm = load_llm(model_vendor)
     vectorstore = load_vectorstore(model_vendor)
+    # This redundant filter retriever is a retriever that will filter out duplicate documents from the vectorstore.
+    # This can happen when the store_embeddings.py is run multiple times with the same source, or may be the source
+    # can have multiple documents with the same content.
+    redundant_filter_retriever = RedundantFilterRetriever(
+        embeddings=load_embedding_model(model_vendor),
+        chroma=vectorstore
+    )
+
     return RetrievalQA.from_chain_type(
         llm=llm,
         # chain_type="map_reduce",
         chain_type="stuff",
         # chain_type="refine",
-        retriever=vectorstore.as_retriever(k=3),
+        # retriever=vectorstore.as_retriever(k=4),
+        retriever=redundant_filter_retriever,
         verbose=True
     )
 

@@ -41,13 +41,13 @@ def load_vectorstore(model_vendor: ModelVendor):
     
 # Search the vectorstore for the most similar documents to the query
 def search_similarity(query: str, vectorstore: Chroma):
-    results = vectorstore.similarity_search(query, k=2)
+    results = vectorstore.similarity_search(query, k=6)
     return results
 
 def main():
     print("Search similarity!")
     vectorstore = load_vectorstore(ModelVendor.GOOGLE)
-    results = search_similarity("What is interesting fact about Charlie?", vectorstore)
+    results = search_similarity("What is interesting fact about the English language?", vectorstore)
     for result in results:
         print("Result: ", result.page_content)
         print("--------------------------------")
