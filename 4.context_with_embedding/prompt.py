@@ -71,9 +71,9 @@ def load_llm(model_vendor: ModelVendor):
 # The chain type can be "stuff", "map_reduce", "map_rerank", "map_rerank_then_stuff"
 # The chain stuff is putting the document into the prompt template and passing it on to the LLM
 # The chain map_reduce:
-#   - It will be getting the n documents from RAG (I am not sure what's the number of documents it will getfor RetrievalQA)
+#   - It will be getting the n documents from RAG (k=n)
 #   - then from each document it will append the result with user message and pass it to LLM to find the best answer.
-#   - It will get 3 best answer from each document
+#   - It will get n best answer from each document
 #   - It will pass the n best answer to another prompt and passing it with user question on to the LLM,
 #   - This will be the final answer.
 # The chain map_rerank:
@@ -97,7 +97,7 @@ def load_retrieval_qa_chain(model_vendor: ModelVendor):
         # chain_type="map_reduce",
         chain_type="stuff",
         # chain_type="refine",
-        retriever=vectorstore.as_retriever(),
+        retriever=vectorstore.as_retriever(k=3),
         verbose=True
     )
 
