@@ -4,6 +4,9 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
+from langchain.globals import set_debug
+
+set_debug(True)
 
 from dotenv import load_dotenv
 from enum import Enum
@@ -67,7 +70,12 @@ def load_llm(model_vendor: ModelVendor):
 # 
 # The chain type can be "stuff", "map_reduce", "map_rerank", "map_rerank_then_stuff"
 # The chain stuff is putting the document into the prompt template and passing it on to the LLM
-# The chain map_reduce is using the map_prompt and reduce_prompt to process the documents
+# The chain map_reduce:
+#   - It will be getting the n documents from RAG (I am not sure what's the number of documents it will getfor RetrievalQA)
+#   - then from each document it will append the result with user message and pass it to LLM to find the best answer.
+#   - It will get 3 best answer from each document
+#   - It will pass the 3 best answer to another prompt and passing it with user question on to the LLM,
+#   - This will be the final answer.
 # The chain map_rerank is using the rerank_prompt to rerank the documents
 # The chain map_rerank_then_stuff is using the rerank_prompt to rerank the documents and then put the documents into the prompt template
 # and passing it on to the LLM
@@ -78,8 +86,9 @@ def load_retrieval_qa_chain(model_vendor: ModelVendor):
     vectorstore = load_vectorstore(model_vendor)
     return RetrievalQA.from_chain_type(
         llm=llm,
-        chain_type="stuff",
-        retriever=vectorstore.as_retriever()
+        chain_type="map_reduce",
+        retriever=vectorstore.as_retriever(),
+        verbose=True
     )
 
 def main():
