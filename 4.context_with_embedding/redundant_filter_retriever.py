@@ -8,14 +8,12 @@ class RedundantFilterRetriever(BaseRetriever):
     chroma: Chroma
 
     def get_relevant_documents(self, query: str) -> list[Document]:
-        # Calculate embedding for the 'query' string
-        emb = self.embeddings.embed_query(query)
-
-        # Take embeddings and feed them into that 
-        # max_marginal_relevance_search_by_vector
-        return self.chroma.max_marginal_relevance_search_by_vector(
-            embedding=emb,
-            lambda_mult=0.8
+        # Use the standard MMR search method that works across vectorstore implementations
+        # This is more portable than using Chroma-specific max_marginal_relevance_search_by_vector
+        return self.chroma.max_marginal_relevance_search(
+            query=query,
+            lambda_mult=0.8,
+            k=4  # Number of documents to return
         )
     
 
