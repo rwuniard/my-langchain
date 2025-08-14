@@ -1,2 +1,7 @@
 chroma_db_openai/
 chroma_db_google/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
