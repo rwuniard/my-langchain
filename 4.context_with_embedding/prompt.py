@@ -74,19 +74,29 @@ def load_llm(model_vendor: ModelVendor):
 #   - It will be getting the n documents from RAG (I am not sure what's the number of documents it will getfor RetrievalQA)
 #   - then from each document it will append the result with user message and pass it to LLM to find the best answer.
 #   - It will get 3 best answer from each document
-#   - It will pass the 3 best answer to another prompt and passing it with user question on to the LLM,
+#   - It will pass the n best answer to another prompt and passing it with user question on to the LLM,
 #   - This will be the final answer.
-# The chain map_rerank is using the rerank_prompt to rerank the documents
+# The chain map_rerank:
+#   - Similar steps as map_reduce, but it will give a score to each document for the first iteration.
+#   - The highest score document will be the final answer.
 # The chain map_rerank_then_stuff is using the rerank_prompt to rerank the documents and then put the documents into the prompt template
 # and passing it on to the LLM
-# The chain map_rerank_then_stuff is the most powerful chain and is the default chain
+# The refine chain:
+#   - It does it in a series. 
+#   - It feed the first result from vector database and feed both the result with the human question to LLM. 
+#   - After it gets the result, it will feed the result from prior result in the series with the second result 
+#     from the vector database to LLM again to get another result.
+#   - It will keep doing it until all the result from vector database is exercised, then that will be the final result.
+#   - The final result can be multiple results from the previous result in the series.
 
 def load_retrieval_qa_chain(model_vendor: ModelVendor):
     llm = load_llm(model_vendor)
     vectorstore = load_vectorstore(model_vendor)
     return RetrievalQA.from_chain_type(
         llm=llm,
-        chain_type="map_reduce",
+        # chain_type="map_reduce",
+        chain_type="stuff",
+        # chain_type="refine",
         retriever=vectorstore.as_retriever(),
         verbose=True
     )
